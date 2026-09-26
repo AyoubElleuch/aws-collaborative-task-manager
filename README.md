@@ -1,24 +1,17 @@
 # AWS Collaborative Task Manager
 
-A React and TypeScript app built with Vite. The application is currently a clean starting point for development.
+Project layout:
 
-## Getting started
+- `frontend/` — React and TypeScript app
+- `backend/` — backend placeholder
+- `infra/bootstrap/` — GitHub to AWS OIDC setup
+- `infra/app/` — app infrastructure placeholder
 
-Install dependencies:
-
-```sh
-npm install
-```
-
-Start the development server:
+## Run the frontend
 
 ```sh
+npm ci --prefix frontend
 npm run dev
 ```
 
-## Available scripts
-
-- `npm run dev` — start the local development server
-- `npm run build` — type-check and build the app for production
-- `npm run preview` — preview the production build locally
-- `npm run lint` — check the code with Oxlint
+From the repository root, `npm run build` and `npm run lint` also run against the frontend. The backend and app infrastructure are not implemented yet.
