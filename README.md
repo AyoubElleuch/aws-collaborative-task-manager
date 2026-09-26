@@ -14,4 +14,4 @@ npm ci --prefix frontend
 npm run dev
 ```
 
-From the repository root, `npm run build` and `npm run lint` also run against the frontend. The backend and app infrastructure are not implemented yet.
+From the repository root, `npm run lint`, `npm test`, and `npm run build` check the frontend. The backend and app infrastructure are not implemented yet.
