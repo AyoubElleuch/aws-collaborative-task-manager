@@ -19,3 +19,34 @@ body,
   min-height: 100%;
   margin: 0;
 }
+
+body {
+  background: #f5f7fa;
+  color: #182230;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 24px;
+}
+
+button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #2458d3;
+  color: white;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+button:focus-visible {
+  outline: 3px solid #182230;
+  outline-offset: 3px;
+}
