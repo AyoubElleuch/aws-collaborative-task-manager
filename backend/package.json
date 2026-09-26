@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "oxlint src tests",
     "test": "vitest run",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "npm run build && node dist/dev.js"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.163",

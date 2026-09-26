@@ -1,50 +1,99 @@
 # AWS Collaborative Task Manager
 
-Project layout:
+React and TypeScript frontend with a TypeScript Lambda health API.
 
-- `frontend/` — React and TypeScript app
-- `backend/` — TypeScript Lambda health handler and tests
-- `infra/bootstrap/` — GitHub to AWS OIDC setup and Terraform state bucket
-- `infra/app/` — application S3 backend; app resources are not defined yet
+## Project layout
 
-Both Terraform roots use separate state files in S3 with locking. See [bootstrap setup and state migration](infra/bootstrap/README.md). To initialize the application root, run `terraform init`, `terraform validate`, and `terraform plan` from `infra/app` in an authenticated shell. Until app resources are added, the plan should report no changes.
+- `frontend/` — frontend page and tests
+- `backend/` — health handler, local HTTP server, and tests
+- `infra/bootstrap/` — GitHub OIDC role and Terraform state bucket
+- `infra/app/` — Lambda, API Gateway, logging, S3, and CloudFront
+- `docs/api.md` — API contract
 
-## Run the frontend
+## Local development
+
+Use Node.js 22. Run commands from the repository root.
+
+Install dependencies:
 
 ```sh
 npm ci --prefix frontend
+npm ci --prefix backend
+```
+
+Create `frontend/.env.development.local` containing:
+
+```dotenv
+VITE_HEALTH_URL=/health
+```
+
+Start the backend in one terminal:
+
+```sh
+npm run dev --prefix backend
+```
+
+Start the frontend in another terminal:
+
+```sh
 npm run dev
 ```
 
-From the repository root, `npm run lint`, `npm test`, and `npm run build` check the frontend.
+Open http://localhost:3000 and click **Check connection**.
 
-## Work on the backend
+Vite forwards `/health` to the backend at http://127.0.0.1:3001.
+Local development does not require AWS credentials.
 
-Use Node.js 22, matching CI. Run these commands from the repository root:
+Restart the backend after changing its code. Restart the frontend
+after changing its environment file.
+
+## Checks
+
+Frontend:
 
 ```sh
-npm ci --prefix backend
+npm run lint
+npm test
+npm run build
+```
+
+Backend:
+
+```sh
 npm run lint --prefix backend
 npm test --prefix backend
 npm run build --prefix backend
 ```
 
-The backend has its own package and dependencies. Its build compiles TypeScript
-from `backend/src` into JavaScript in `backend/dist`. Tests live separately in
-`backend/tests` and run directly against the source using Vitest. CI checks both
-the frontend and backend on pull requests and pushes to `dev` and `main`.
+Automated tests do not require running servers or AWS access.
 
-After building, invoke the compiled handler locally:
+## Infrastructure
+
+Terraform defines the health API and frontend hosting. Both Terraform
+roots store state in S3 using separate keys with locking.
+
+See [bootstrap setup](infra/bootstrap/README.md) for state and identity
+configuration.
+
+To review application infrastructure, use an authenticated shell.
+Build the backend first because Terraform packages the compiled handler:
 
 ```sh
-node --input-type=module -e "import { handler } from './backend/dist/main.js'; console.log(await handler())"
+npm run build --prefix backend
+cd infra/app
+terraform init
+terraform validate
+terraform plan
 ```
 
-This prints a response with status code `200`, a JSON content-type header, and
-the body `'{"status":"ok"}'`. It calls the function directly; it does not start an
-HTTP server or require AWS credentials.
+A plan previews changes without applying them.
 
-Start reading with the [health API contract](docs/api.md), then the
-[handler](backend/src/main.ts) and its [tests](backend/tests/main.test.ts).
-The API Gateway route, Lambda deployment, and application infrastructure are the
-next step; no public health URL exists yet.
+The application exposes these Terraform outputs:
+
+- `health_url`
+- `frontend_bucket_name`
+- `website_url`
+- `frontend_distribution_id`
+
+Deployment automation is not configured yet. The frontend deployment
+build will need `VITE_HEALTH_URL` set to the `health_url` output.
